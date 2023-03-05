@@ -62,7 +62,7 @@ export class Microphone extends EventEmitter {
 			channels: 1,
 		});
 
-		stream.on("data", async (data) => {
+		stream.on("data", async (data: Buffer) => {
 			if (listening) {
 				if (!spinner.isSpinning) {
 					spinner.start();
@@ -73,7 +73,7 @@ export class Microphone extends EventEmitter {
 		});
 
 		stream.on("error", async (err) => {
-			console.log("Mic Error:", err);
+			spinner.fail(`Mic Error: ${err}`);
 		});
 
 		stream.on("silence", async () => {
@@ -83,12 +83,18 @@ export class Microphone extends EventEmitter {
 			const reader_name = writer_name;
 			writer_name = `${Date.now()}.wav`;
 			writer.end(async () => {
+				const size = fs.statSync(path.resolve(dir, reader_name)).size;
+				if (size < 1000) {
+					return;
+				}
 				const reader = fs.createReadStream(path.resolve(dir, reader_name));
 				try {
 					const trans = await openai.createTranscription(reader, this.model, this.prompt);
 					const result = trans.data.text.trim();
-					spinner.info(result);
-					out?.write(`${result}\n`);
+					if (result) {
+						spinner.info(result);
+						out?.write(`${result}\n`);
+					}
 				} catch (err) {
 					spinner.fail("Error");
 					console.error(err, reader_name);
