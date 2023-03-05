@@ -28,7 +28,7 @@ export class Microphone extends EventEmitter {
 		model = "whisper-1",
 		prompt = undefined as string | undefined,
 		output = undefined as string | undefined,
-		silence = 3,
+		silence = 4,
 	} = {}) {
 		super();
 		this.model = model;
@@ -82,26 +82,33 @@ export class Microphone extends EventEmitter {
 
 			const reader_name = writer_name;
 			writer_name = `${Date.now()}.wav`;
-			writer.end(async () => {
-				const size = fs.statSync(path.resolve(dir, reader_name)).size;
-				if (size < 1000) {
-					return;
-				}
-				const reader = fs.createReadStream(path.resolve(dir, reader_name));
-				try {
-					const trans = await openai.createTranscription(reader, this.model, this.prompt);
-					const result = trans.data.text.trim();
-					if (result) {
-						spinner.info(result);
-						out?.write(`${result}\n`);
+			writer.end(() => {
+				setTimeout(async () => {
+					const size = fs.statSync(path.resolve(dir, reader_name)).size;
+					if (size < 1000) {
+						return;
 					}
-				} catch (err) {
-					spinner.fail("Error");
-					console.error(err, reader_name);
-					// @ts-expect-error
-					console.error(err.response.data);
-					process.exit(1);
-				}
+
+					const reader = fs.createReadStream(path.resolve(dir, reader_name));
+					try {
+						const trans = await openai.createTranscription(
+							reader,
+							this.model,
+							this.prompt,
+						);
+						const result = trans.data.text.trim();
+						if (result) {
+							spinner.info(result);
+							out?.write(`${result}\n`);
+						}
+					} catch (err) {
+						spinner.fail("Error");
+						console.error(err, reader_name);
+						// @ts-expect-error
+						console.error(err.response.data);
+						process.exit(1);
+					}
+				}, 100);
 			});
 			writer = new FileWriter(path.resolve(dir, writer_name), {
 				sampleRate: 16000,
