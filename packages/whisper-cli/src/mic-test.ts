@@ -2,8 +2,8 @@ import type { Transform } from "node:stream";
 import ora from "ora";
 import mic from "./mic";
 
-export default function (silence: number) {
-	const source = mic({ exitOnSilence: silence });
+export default function (silence: number, threshold: number) {
+	const source = mic({ exitOnSilence: silence, silenceThresh: threshold });
 	const stream: Transform = source.getAudioStream();
 
 	const spinner = ora("Initializing").start();
@@ -27,13 +27,13 @@ export default function (silence: number) {
 
 	stream.on("silence", async () => {
 		listening = false;
-		spinner.info(`Silence (${frames})`);
+		spinner.info(`Silence (after ${frames} hearable frames)`);
 		frames = 0;
 	});
 
 	stream.on("sound", async () => {
 		listening = true;
-		spinner.info(`Sound (${frames})`);
+		spinner.info(`Sound (after ${frames} silent frames)`);
 		frames = 0;
 	});
 

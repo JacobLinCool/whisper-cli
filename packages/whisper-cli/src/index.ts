@@ -65,13 +65,21 @@ program
 	.option("-p, --prompt <prompt>", "Prompt for hints")
 	.option("-m, --model <model>", "Model to use", "whisper-1")
 	.option("-s, --silence <frames>", "Silence duration in frames", Number, 2)
+	.option("-t, --threshold <strengh>", "Silence threshold", Number, 2400)
 	.action(
-		async (opts: { output?: string; prompt?: string; model?: string; silence?: number }) => {
+		async (opts: {
+			output?: string;
+			prompt?: string;
+			model?: string;
+			silence: number;
+			threshold: number;
+		}) => {
 			const mic = new Microphone({
 				model: opts.model,
 				prompt: opts.prompt,
 				silence: opts.silence,
 				output: opts.output,
+				threshold: opts.threshold,
 			});
 			mic.start();
 
@@ -91,8 +99,9 @@ program
 	.command("mic-test")
 	.description("Test microphone")
 	.option("-s, --silence <frames>", "Silence duration in frames", Number, 2)
-	.action(async (opts: { silence: number }) => {
-		mic_test(opts.silence);
+	.option("-t, --threshold <strengh>", "Silence threshold", Number, 2400)
+	.action(async (opts: { silence: number; threshold: number }) => {
+		mic_test(opts.silence, opts.threshold);
 	});
 
 program.parse(process.argv);

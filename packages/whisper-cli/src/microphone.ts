@@ -23,25 +23,28 @@ export class Microphone extends EventEmitter {
 	private prompt?: string;
 	private output?: string;
 	private silence: number;
+	private threshold: number;
 
 	constructor({
 		model = "whisper-1",
 		prompt = undefined as string | undefined,
 		output = undefined as string | undefined,
 		silence = 2,
+		threshold = 2400,
 	} = {}) {
 		super();
 		this.model = model;
 		this.prompt = prompt;
 		this.output = output;
 		this.silence = silence;
+		this.threshold = threshold;
 	}
 
 	start(): void {
 		const spinner = ora("Initializing").start();
 		this.spinner = spinner;
 
-		this.mic = mic({ exitOnSilence: this.silence });
+		this.mic = mic({ exitOnSilence: this.silence, silenceThresh: this.threshold });
 		const stream: Transform = this.mic.getAudioStream();
 
 		const config = new Configuration({ apiKey: KEY });

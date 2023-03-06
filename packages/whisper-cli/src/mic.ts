@@ -2,116 +2,131 @@
 import { spawn } from "node:child_process";
 import { type } from "node:os";
 import { PassThrough, Transform } from "node:stream";
-import util from "node:util";
+import type { TransformCallback } from "node:stream";
 
 const isMac = type() == "Darwin";
 const isWindows = type().indexOf("Windows") > -1;
 
-function IsSilence(options: any) {
-	// @ts-expect-error
-	var that = this;
-	if (options && options.debug) {
-		that.debug = options.debug;
-		delete options.debug;
+class IsSilence extends Transform {
+	public options = { debug: false };
+	protected consecSilenceCount = 0;
+	protected numSilenceFramesExitThresh = 0;
+	protected silenceThresh = 2000;
+
+	constructor(options?: { debug: boolean }) {
+		super();
+		this.options.debug = options?.debug || false;
 	}
-	Transform.call(that, options);
-	var consecSilenceCount = 0;
-	var numSilenceFramesExitThresh = 0;
 
-	that.getNumSilenceFramesExitThresh = function getNumSilenceFramesExitThresh() {
-		return numSilenceFramesExitThresh;
-	};
+	public getNumSilenceFramesExitThresh() {
+		return this.numSilenceFramesExitThresh;
+	}
 
-	that.getConsecSilenceCount = function getConsecSilenceCount() {
-		return consecSilenceCount;
-	};
+	public getConsecSilenceCount() {
+		return this.consecSilenceCount;
+	}
 
-	that.setNumSilenceFramesExitThresh = function setNumSilenceFramesExitThresh(numFrames: number) {
-		numSilenceFramesExitThresh = numFrames;
+	public setNumSilenceFramesExitThresh(numFrames: number) {
+		this.numSilenceFramesExitThresh = numFrames;
 		return;
-	};
+	}
 
-	that.incrConsecSilenceCount = function incrConsecSilenceCount() {
-		consecSilenceCount++;
-		return consecSilenceCount;
-	};
-
-	that.resetConsecSilenceCount = function resetConsecSilenceCount() {
-		consecSilenceCount = 0;
+	public setSilenceThresh(silenceThresh: number) {
+		this.silenceThresh = silenceThresh;
 		return;
-	};
-}
-util.inherits(IsSilence, Transform);
+	}
 
-IsSilence.prototype._transform = function (chunk: any, encoding: any, callback: any) {
-	var i;
-	var speechSample;
-	var silenceLength = 0;
-	var self = this;
-	var debug = self.debug;
-	var consecutiveSilence = self.getConsecSilenceCount();
-	var numSilenceFramesExitThresh = self.getNumSilenceFramesExitThresh();
-	var incrementConsecSilence = self.incrConsecSilenceCount;
-	var resetConsecSilence = self.resetConsecSilenceCount;
+	public incrConsecSilenceCount() {
+		this.consecSilenceCount++;
+		return this.consecSilenceCount;
+	}
 
-	if (numSilenceFramesExitThresh) {
-		for (i = 0; i < chunk.length; i = i + 2) {
-			if (chunk[i + 1] > 128) {
-				speechSample = (chunk[i + 1] - 256) * 256;
-			} else {
-				speechSample = chunk[i + 1] * 256;
-			}
-			speechSample += chunk[i];
+	public resetConsecSilenceCount() {
+		this.consecSilenceCount = 0;
+		return;
+	}
 
-			if (Math.abs(speechSample) > 2000) {
-				if (debug) {
-					console.log("Found speech block");
+	public _transform(chunk: any, encoding: BufferEncoding, callback: TransformCallback) {
+		const debug = this.options.debug;
+		const numSilenceFramesExitThresh = this.getNumSilenceFramesExitThresh();
+
+		let i;
+		let speechSample;
+		let silenceLength = 0;
+		let consecutiveSilence = this.getConsecSilenceCount();
+
+		if (numSilenceFramesExitThresh) {
+			for (i = 0; i < chunk.length; i = i + 2) {
+				if (chunk[i + 1] > 128) {
+					speechSample = (chunk[i + 1] - 256) * 256;
+				} else {
+					speechSample = chunk[i + 1] * 256;
 				}
-				//emit 'sound' if we hear a sound after a silence
-				if (consecutiveSilence >= numSilenceFramesExitThresh) self.emit("sound");
-				resetConsecSilence();
-				break;
-			} else {
-				silenceLength++;
-			}
-		}
-		if (silenceLength == chunk.length / 2) {
-			consecutiveSilence = incrementConsecSilence();
-			if (debug) {
-				console.log(
-					"Found silence block: %d of %d",
-					consecutiveSilence,
-					numSilenceFramesExitThresh,
-				);
-			}
-			//emit 'silence' only once each time the threshold condition is met
-			if (consecutiveSilence === numSilenceFramesExitThresh) {
-				self.emit("silence");
-			}
-		}
-	}
-	this.push(chunk);
-	callback();
-};
+				speechSample += chunk[i];
 
-export default function mic(options: any) {
+				if (Math.abs(speechSample) > this.silenceThresh) {
+					if (debug) {
+						console.log("Found speech block");
+					}
+					//emit 'sound' if we hear a sound after a silence
+					if (consecutiveSilence >= numSilenceFramesExitThresh) {
+						this.emit("sound");
+					}
+					this.resetConsecSilenceCount();
+					break;
+				} else {
+					silenceLength++;
+				}
+			}
+			if (silenceLength == chunk.length / 2) {
+				consecutiveSilence = this.incrConsecSilenceCount();
+				if (debug) {
+					console.log(
+						"Found silence block: %d of %d",
+						consecutiveSilence,
+						numSilenceFramesExitThresh,
+					);
+				}
+				//emit 'silence' only once each time the threshold condition is met
+				if (consecutiveSilence === numSilenceFramesExitThresh) {
+					this.emit("silence");
+				}
+			}
+		}
+		this.push(chunk);
+		callback();
+	}
+}
+
+export default function mic(options: {
+	endian?: string;
+	bitwidth?: string;
+	encoding?: string;
+	rate?: string;
+	channels?: string;
+	device?: string;
+	exitOnSilence?: number;
+	silenceThresh?: number;
+	fileType?: string;
+	debug?: boolean;
+}) {
 	options = options || {};
-	var that: any = {};
-	var endian = options.endian || "little";
-	var bitwidth = options.bitwidth || "16";
-	var encoding = options.encoding || "signed-integer";
-	var rate = options.rate || "16000";
-	var channels = options.channels || "1";
-	var device = options.device || "plughw:1,0";
-	var exitOnSilence = options.exitOnSilence || 0;
-	var fileType = options.fileType || "raw";
-	var debug = options.debug || false;
-	var format: any, formatEndian, formatEncoding;
-	var audioProcess: any = null;
-	var infoStream = new PassThrough();
-	// @ts-expect-error
-	var audioStream = new IsSilence({ debug: debug });
-	var audioProcessOptions: any = {
+	const that: any = {};
+	const endian = options.endian || "little";
+	const bitwidth = options.bitwidth || "16";
+	const encoding = options.encoding || "signed-integer";
+	const rate = options.rate || "16000";
+	const channels = options.channels || "1";
+	const device = options.device || "plughw:1,0";
+	const exitOnSilence = Number(options.exitOnSilence) || 0;
+	const silenceThresh = Number(options.silenceThresh) || 2000;
+	const fileType = options.fileType || "raw";
+	const debug = options.debug || false;
+	let format: any, formatEndian, formatEncoding;
+	let audioProcess: any = null;
+	const infoStream = new PassThrough();
+	const audioStream = new IsSilence({ debug });
+	const audioProcessOptions: any = {
 		stdio: ["ignore", "pipe", "ignore"],
 	};
 
@@ -131,7 +146,8 @@ export default function mic(options: any) {
 		formatEncoding = "S";
 	}
 	format = formatEncoding + bitwidth + "_" + formatEndian;
-	audioStream.setNumSilenceFramesExitThresh(parseInt(exitOnSilence, 10));
+	audioStream.setNumSilenceFramesExitThresh(Math.round(exitOnSilence));
+	audioStream.setSilenceThresh(Math.round(silenceThresh));
 
 	that.start = function start() {
 		if (audioProcess === null) {
