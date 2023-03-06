@@ -1,5 +1,11 @@
 # whisper-cli
 
+## 1.2.0
+
+### Minor Changes
+
+-   [`0ab1ab0`](https://github.com/JacobLinCool/whisper-cli/commit/0ab1ab05921321653273278ab3f20af64ad28544) Thanks [@JacobLinCool](https://github.com/JacobLinCool)! - New option to configure silent threshold in microphone mode
+
 ## 1.1.0
 
 ### Minor Changes
