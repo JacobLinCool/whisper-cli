@@ -1,5 +1,15 @@
 # whisper-cli
 
+## 1.1.0
+
+### Minor Changes
+
+-   [`58caa10`](https://github.com/JacobLinCool/whisper-cli/commit/58caa105f7fff832bd5239d816bc8cedd2db4931) Thanks [@JacobLinCool](https://github.com/JacobLinCool)! - Add microphone test
+
+### Patch Changes
+
+-   [`563fe91`](https://github.com/JacobLinCool/whisper-cli/commit/563fe916cebf552d0e0607249ec58c737e5a5f38) Thanks [@JacobLinCool](https://github.com/JacobLinCool)! - Fix the problem of ignoring sound event
+
 ## 1.0.1
 
 ### Patch Changes
