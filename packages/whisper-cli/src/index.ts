@@ -64,7 +64,7 @@ program
 	.option("-o, --output <file>", "Output file")
 	.option("-p, --prompt <prompt>", "Prompt for hints")
 	.option("-m, --model <model>", "Model to use", "whisper-1")
-	.option("-s, --silence <frames>", "Silence duration in frames", Number, 4)
+	.option("-s, --silence <frames>", "Silence duration in frames", Number, 2)
 	.action(
 		async (opts: { output?: string; prompt?: string; model?: string; silence?: number }) => {
 			const mic = new Microphone({
@@ -90,7 +90,7 @@ program
 program
 	.command("mic-test")
 	.description("Test microphone")
-	.option("-s, --silence <frames>", "Silence duration in frames", Number, 4)
+	.option("-s, --silence <frames>", "Silence duration in frames", Number, 2)
 	.action(async (opts: { silence: number }) => {
 		mic_test(opts.silence);
 	});

@@ -28,7 +28,7 @@ export class Microphone extends EventEmitter {
 		model = "whisper-1",
 		prompt = undefined as string | undefined,
 		output = undefined as string | undefined,
-		silence = 4,
+		silence = 2,
 	} = {}) {
 		super();
 		this.model = model;
@@ -62,13 +62,23 @@ export class Microphone extends EventEmitter {
 			channels: 1,
 		});
 
+		const backward_buffers: Buffer[] = [];
+
 		stream.on("data", async (data: Buffer) => {
 			if (listening) {
 				if (!spinner.isSpinning) {
 					spinner.start();
 				}
 				spinner.text = "Listening ...";
+				for (let i = 0; i < backward_buffers.length; i++) {
+					writer.write(backward_buffers.shift());
+				}
 				writer.write(data);
+			} else {
+				backward_buffers.push(data);
+				if (backward_buffers.length > 2) {
+					backward_buffers.shift();
+				}
 			}
 		});
 
@@ -81,8 +91,13 @@ export class Microphone extends EventEmitter {
 			spinner.text = "Recognizing ...";
 
 			const reader_name = writer_name;
+			const old_wirter = writer;
 			writer_name = `${Date.now()}.wav`;
-			writer.end(() => {
+			writer = new FileWriter(path.resolve(dir, writer_name), {
+				sampleRate: 16000,
+				channels: 1,
+			});
+			old_wirter.end(() => {
 				setTimeout(async () => {
 					const size = fs.statSync(path.resolve(dir, reader_name)).size;
 					if (size < 1000) {
@@ -109,10 +124,6 @@ export class Microphone extends EventEmitter {
 						process.exit(1);
 					}
 				}, 100);
-			});
-			writer = new FileWriter(path.resolve(dir, writer_name), {
-				sampleRate: 16000,
-				channels: 1,
 			});
 		});
 

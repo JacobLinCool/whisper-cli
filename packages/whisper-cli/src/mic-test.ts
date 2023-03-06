@@ -9,13 +9,15 @@ export default function (silence: number) {
 	const spinner = ora("Initializing").start();
 
 	let listening = true;
+	let frames = 0;
 
 	stream.on("data", async () => {
+		frames++;
 		if (listening) {
 			if (!spinner.isSpinning) {
 				spinner.start();
 			}
-			spinner.text = "Listening ...";
+			spinner.text = `Listening (${frames}) ...`;
 		}
 	});
 
@@ -25,12 +27,14 @@ export default function (silence: number) {
 
 	stream.on("silence", async () => {
 		listening = false;
-		spinner.info("Silence");
+		spinner.info(`Silence (${frames})`);
+		frames = 0;
 	});
 
 	stream.on("sound", async () => {
 		listening = true;
-		spinner.info("Sound");
+		spinner.info(`Sound (${frames})`);
+		frames = 0;
 	});
 
 	source.start();

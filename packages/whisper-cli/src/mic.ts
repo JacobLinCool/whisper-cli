@@ -68,7 +68,7 @@ IsSilence.prototype._transform = function (chunk: any, encoding: any, callback: 
 					console.log("Found speech block");
 				}
 				//emit 'sound' if we hear a sound after a silence
-				if (consecutiveSilence > numSilenceFramesExitThresh) self.emit("sound");
+				if (consecutiveSilence >= numSilenceFramesExitThresh) self.emit("sound");
 				resetConsecSilence();
 				break;
 			} else {
