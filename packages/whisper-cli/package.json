@@ -22,7 +22,7 @@
 		"debug": "^4.3.4",
 		"dotenv": "^16.0.3",
 		"openai": "^3.2.1",
-		"ora": "^6.1.2",
+		"ora": "^7.0.0",
 		"wav": "^1.0.2"
 	},
 	"devDependencies": {
