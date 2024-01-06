@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import type { Transform } from "node:stream";
 import { config } from "dotenv";
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from "openai";
 import ora, { Ora } from "ora";
 import { FileWriter } from "wav";
 import mic from "./mic";
@@ -47,8 +47,7 @@ export class Microphone extends EventEmitter {
 		this.mic = mic({ exitOnSilence: this.silence, silenceThresh: this.threshold });
 		const stream: Transform = this.mic.getAudioStream();
 
-		const config = new Configuration({ apiKey: KEY });
-		const openai = new OpenAIApi(config);
+		const openai = new OpenAI({ apiKey: KEY });
 
 		const dir = path.resolve(os.tmpdir(), "whisper-cli");
 		if (!fs.existsSync(dir)) {
@@ -109,12 +108,13 @@ export class Microphone extends EventEmitter {
 
 					const reader = fs.createReadStream(path.resolve(dir, reader_name));
 					try {
-						const trans = await openai.createTranscription(
-							reader,
-							this.model,
-							this.prompt,
-						);
-						const result = trans.data.text.trim();
+						const trans = await openai.audio.transcriptions.create({
+							file: reader,
+							model: this.model,
+							prompt: this.prompt,
+							response_format: "json",
+						});
+						const result = trans.text.trim();
 						if (result) {
 							spinner.info(result);
 							out?.write(`${result}\n`);

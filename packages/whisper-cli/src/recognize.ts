@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { config } from "dotenv";
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from "openai";
 
 config();
 
@@ -13,11 +13,10 @@ export async function recognize(
 	audio_file: string,
 	{ model = "whisper-1", prompt = undefined as string | undefined } = {},
 ): Promise<string> {
-	const config = new Configuration({ apiKey: KEY });
-	const openai = new OpenAIApi(config);
+	const openai = new OpenAI({ apiKey: KEY });
 
 	const file = fs.createReadStream(audio_file);
 
-	const trans = await openai.createTranscription(file, model, prompt);
-	return trans.data.text;
+	const trans = await openai.audio.transcriptions.create({ file, model, prompt });
+	return trans.text;
 }
