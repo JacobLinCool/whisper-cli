@@ -1,8 +1,8 @@
 // adapted from https://github.com/ashishbajaj99/mic (MIT License)
 import { spawn } from "node:child_process";
 import { type } from "node:os";
-import { PassThrough, Transform } from "node:stream";
 import type { TransformCallback } from "node:stream";
+import { PassThrough, Transform } from "node:stream";
 
 const isMac = type() == "Darwin";
 const isWindows = type().indexOf("Windows") > -1;

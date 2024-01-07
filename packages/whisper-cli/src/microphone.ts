@@ -1,21 +1,15 @@
+import { config } from "dotenv";
 import EventEmitter from "node:events";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { Transform } from "node:stream";
-import { config } from "dotenv";
 import { OpenAI } from "openai";
 import ora, { Ora } from "ora";
 import { FileWriter } from "wav";
 import mic from "./mic";
 
 config();
-
-const KEY = process.env.OPENAI_API_KEY;
-if (!KEY) {
-	throw new Error("OpenAI API key (env.OPENAI_API_KEY) not found");
-}
-
 export class Microphone extends EventEmitter {
 	private mic?: any;
 	private spinner?: Ora;
@@ -41,6 +35,11 @@ export class Microphone extends EventEmitter {
 	}
 
 	start(): void {
+		const KEY = process.env.OPENAI_API_KEY;
+		if (!KEY) {
+			throw new Error("OpenAI API key (env.OPENAI_API_KEY) not found");
+		}
+
 		const spinner = ora("Initializing").start();
 		this.spinner = spinner;
 

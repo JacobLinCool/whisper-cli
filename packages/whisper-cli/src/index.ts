@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-import fs from "node:fs";
 import chalk from "chalk";
 import { program } from "commander";
+import fs from "node:fs";
 import ora from "ora";
 import { convert } from "./convert";
 import mic_test from "./mic-test";
 import { Microphone } from "./microphone";
 import { pkg } from "./pkg";
 import { recognize } from "./recognize";
+import { smart } from "./smart";
 
 program.name("whisper").description(pkg.description).version(pkg.version);
 
@@ -103,5 +104,7 @@ program
 	.action(async (opts: { silence: number; threshold: number }) => {
 		mic_test(opts.silence, opts.threshold);
 	});
+
+program.addCommand(smart);
 
 program.parse(process.argv);

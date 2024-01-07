@@ -12,11 +12,4 @@ overrides:
           useTabs: false
 
 plugins:
-    - ./node_modules/@trivago/prettier-plugin-sort-imports/lib/src/index.js
-pluginSearchDirs: false
-
-importOrder:
-    - "^node:"
-    - "^[^@.]"
-    - "^@"
-    - "^\\."
+    - prettier-plugin-organize-imports

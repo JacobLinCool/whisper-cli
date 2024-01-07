@@ -8,4 +8,5 @@ export default defineConfig(() => ({
 	shims: true,
 	clean: true,
 	splitting: false,
+	external: ["smart-whisper"],
 }));
