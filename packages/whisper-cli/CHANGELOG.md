@@ -1,5 +1,11 @@
 # whisper-cli
 
+## 1.3.2
+
+### Patch Changes
+
+- [`1967715`](https://github.com/JacobLinCool/whisper-cli/commit/1967715fd22d961be23e91f42f7ac7ab2b3e95d8) Thanks [@JacobLinCool](https://github.com/JacobLinCool)! - Support --n-thread (-n) option for smart whisper
+
 ## 1.3.1
 
 ### Patch Changes
