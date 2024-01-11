@@ -14,6 +14,7 @@ export const server = new Command("server")
 	.description("run a transcribe server of Smart Whisper")
 	.option("-m, --model <model>", "Model to use", "base")
 	.option("-g, --gpu", "Use GPU", false)
+	.option("-n, --n-thread <n_thread>", "Number of threads to use", (val) => parseInt(val), 4)
 	.option(
 		"-t, --timeout <timeout>",
 		"Time in seconds to wait before offloading the model if it's not being used.",
@@ -23,8 +24,15 @@ export const server = new Command("server")
 	.option("-p, --port <port>", "Port to listen on", (val) => parseInt(val), 3000)
 	.action(run);
 
-async function run(opt: { model?: string; gpu?: boolean; timeout?: number; port?: number }) {
+async function run(opt: {
+	model?: string;
+	gpu?: boolean;
+	nThread?: number;
+	timeout?: number;
+	port?: number;
+}) {
 	opt.model = opt.model || "base";
+	opt.nThread = opt.nThread || 4;
 	const model = manager.check(opt.model) ? manager.resolve(opt.model) : opt.model;
 	if (!fs.existsSync(model)) {
 		throw new Error(`Model ${opt.model} not found`);
@@ -179,6 +187,7 @@ async function run(opt: { model?: string; gpu?: boolean; timeout?: number; port?
 				initial_prompt: typeof options.prompt === "string" ? options.prompt : undefined,
 				temperature: Number(options.temperature) || 0,
 				language: options.language || "auto",
+				n_threads: opt.nThread,
 			});
 
 			const results = await result;

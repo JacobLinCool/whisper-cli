@@ -11,6 +11,7 @@ export const transcribe = new Command("transcribe")
 	.option("-p, --prompt <prompt>", "Prompt")
 	.option("-t, --temperature <temperature>", "Temperature", (val) => parseFloat(val), 0)
 	.option("-g, --gpu", "Use GPU", false)
+	.option("-n, --n-thread <n_thread>", "Number of threads to use", (val) => parseInt(val), 4)
 	.option("-l, --language <language>", "Language", "auto")
 	.option("-m, --model <model>", "Model to use", "base")
 	.action(
@@ -22,6 +23,7 @@ export const transcribe = new Command("transcribe")
 				model?: string;
 				temperature?: number;
 				gpu?: boolean;
+				nThread?: number;
 				language?: string;
 			},
 		) => {
@@ -38,6 +40,7 @@ export const transcribe = new Command("transcribe")
 				initial_prompt: opt.prompt,
 				temperature: opt.temperature,
 				language: opt.language,
+				n_threads: opt.nThread,
 			});
 
 			const results = await result;
