@@ -178,6 +178,7 @@ async function run(opt: { model?: string; gpu?: boolean; timeout?: number; port?
 			const { result } = await whisper.transcribe(channelData[0], {
 				initial_prompt: typeof options.prompt === "string" ? options.prompt : undefined,
 				temperature: Number(options.temperature) || 0,
+				language: options.language || "auto",
 			});
 
 			const results = await result;
