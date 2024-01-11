@@ -1,5 +1,11 @@
 # whisper-cli
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f8545c1`](https://github.com/JacobLinCool/whisper-cli/commit/f8545c18c7fc51533efa4ff7e68d986e201965bc) Thanks [@JacobLinCool](https://github.com/JacobLinCool)! - Fix language option ignored
+
 ## 1.3.0
 
 ### Minor Changes
