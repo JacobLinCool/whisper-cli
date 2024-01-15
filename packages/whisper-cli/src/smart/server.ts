@@ -63,7 +63,9 @@ async function run(opt: {
 				description: "Smart Whisper API",
 				version: "1.0.0",
 			},
-			servers: [{ url: `http://localhost:${port}` }],
+			servers: [
+				{ url: "{server}", variables: { server: { default: `http://localhost:${port}` } } },
+			],
 			tags: [{ name: "transcribe", description: "Transcribe audio" }],
 			paths: {},
 		},
@@ -200,7 +202,8 @@ async function run(opt: {
 	);
 
 	server.get("/openapi.json", async (_, reply) => {
-		reply.send(server.swagger());
+		const openapi = server.swagger();
+		reply.send(openapi);
 	});
 
 	server.listen({ port }, (err, address) => {

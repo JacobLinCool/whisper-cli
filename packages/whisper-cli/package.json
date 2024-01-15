@@ -31,7 +31,7 @@
 		"wav": "^1.0.2"
 	},
 	"optionalDependencies": {
-		"smart-whisper": "^0.1.0"
+		"smart-whisper": "^0.4.0"
 	},
 	"devDependencies": {
 		"@types/node-wav": "^0.0.3",

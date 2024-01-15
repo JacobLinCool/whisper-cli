@@ -96,8 +96,8 @@ importers:
                 version: 1.0.2
         optionalDependencies:
             smart-whisper:
-                specifier: ^0.1.0
-                version: 0.1.0
+                specifier: ^0.4.0
+                version: 0.4.0
         devDependencies:
             "@types/node-wav":
                 specifier: ^0.0.3
@@ -7170,10 +7170,10 @@ packages:
             is-fullwidth-code-point: 5.0.0
         dev: true
 
-    /smart-whisper@0.1.0:
+    /smart-whisper@0.4.0:
         resolution:
             {
-                integrity: sha512-b1Mi3mNuCnYgLnd+ucJpXGfzBD/D9AU0V1Ch0hEtvtFHNRrmlA8m4AFxK/FTkl+diYXYg5ygYw9dKT/HKlWlSA==,
+                integrity: sha512-dOIOd4rXORgzZi8H7Ev7fifFxqFEBadzErFxIHNqoKQgDbWuB8TuluR9bTuqBEntslWb5CNstQ/1cdB2OB4nyg==,
             }
         requiresBuild: true
         dependencies:
