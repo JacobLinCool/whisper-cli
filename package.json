@@ -40,5 +40,6 @@
 	"bugs": {
 		"url": "https://github.com/JacobLinCool/whisper-cli/issues"
 	},
-	"homepage": "https://jacoblincool.github.io/whisper-cli"
+	"homepage": "https://jacoblincool.github.io/whisper-cli",
+	"packageManager": "pnpm@9.11.0"
 }
