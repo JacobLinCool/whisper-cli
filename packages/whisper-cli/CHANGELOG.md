@@ -1,5 +1,11 @@
 # whisper-cli
 
+## 1.4.1
+
+### Patch Changes
+
+- [`9c3f746`](https://github.com/JacobLinCool/whisper-cli/commit/9c3f74625a91ae70ed398385e18014ec6314df3c) Thanks [@JacobLinCool](https://github.com/JacobLinCool)! - upgrade smart whisper to 0.8.0
+
 ## 1.4.0
 
 ### Minor Changes
