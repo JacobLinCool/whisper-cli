@@ -130,6 +130,19 @@ async function run(opt: {
 								},
 							],
 						},
+						format: {
+							oneOf: [
+								{ type: "string", enum: ["simple", "detail"] },
+								{
+									type: "object",
+									properties: {
+										value: {
+											type: "string",
+										},
+									},
+								},
+							],
+						},
 					},
 				},
 				response: {
@@ -142,6 +155,19 @@ async function run(opt: {
 								text: { type: "string" },
 								from: { type: "number" },
 								to: { type: "number" },
+								confidence: { type: "number", nullable: true },
+								tokens: {
+									type: "array",
+									items: {
+										type: "object",
+										properties: {
+											text: { type: "string" },
+											id: { type: "number" },
+											p: { type: "number" },
+										},
+									},
+									nullable: true,
+								},
 							},
 						},
 					},
@@ -173,6 +199,9 @@ async function run(opt: {
 			if (body.language?.value) {
 				options.language = body.language.value;
 			}
+			if (body.format?.value) {
+				options.format = body.format.value;
+			}
 
 			if (!file) {
 				throw new Error("No file found");
@@ -190,6 +219,7 @@ async function run(opt: {
 				temperature: Number(options.temperature) || 0,
 				language: options.language || "auto",
 				n_threads: opt.nThread,
+				format: (options.format || "simple") as "simple" | "detail",
 			});
 
 			const results = await result;

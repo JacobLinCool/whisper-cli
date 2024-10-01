@@ -96,8 +96,8 @@ importers:
                 version: 1.0.2
         optionalDependencies:
             smart-whisper:
-                specifier: ^0.4.0
-                version: 0.4.0
+                specifier: file:/Users/jacoblincool/Documents/GitHub/smart-whisper
+                version: file:../smart-whisper
         devDependencies:
             "@types/node-wav":
                 specifier: ^0.0.3
@@ -7170,17 +7170,6 @@ packages:
             is-fullwidth-code-point: 5.0.0
         dev: true
 
-    /smart-whisper@0.4.0:
-        resolution:
-            {
-                integrity: sha512-dOIOd4rXORgzZi8H7Ev7fifFxqFEBadzErFxIHNqoKQgDbWuB8TuluR9bTuqBEntslWb5CNstQ/1cdB2OB4nyg==,
-            }
-        requiresBuild: true
-        dependencies:
-            node-addon-api: 7.0.0
-        dev: false
-        optional: true
-
     /smartwrap@2.0.2:
         resolution:
             {
@@ -8351,3 +8340,12 @@ packages:
             }
         engines: { node: ">=10" }
         dev: true
+
+    file:../smart-whisper:
+        resolution: { directory: ../smart-whisper, type: directory }
+        name: smart-whisper
+        requiresBuild: true
+        dependencies:
+            node-addon-api: 7.0.0
+        dev: false
+        optional: true
